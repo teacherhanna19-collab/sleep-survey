@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>청소년 수면 습관 설문조사</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-50: #EEEDFE;
+      --purple-200: #AFA9EC;
+      --purple-400: #7F77DD;
+      --purple-600: #534AB7;
+      --purple-800: #3C3489;
+      --teal-50: #E1F5EE;
+      --teal-600: #0F6E56;
+      --amber-50: #FAEEDA;
+      --amber-600: #854F0B;
+      --red-50: #FCEBEB;
+      --red-600: #791F1F;
+      --green-50: #EAF3DE;
+      --green-600: #3B6D11;
+      --bg: #F7F6FF;
+      --card: #FFFFFF;
+      --text-primary: #1a1a2e;
+      --text-secondary: #5a5a7a;
+      --text-muted: #9898b8;
+      --border: rgba(127,119,221,0.2);
+      --border-hover: rgba(127,119,221,0.4);
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(127,119,221,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -150px; right: -150px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .survey-wrap {
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page { display: none; animation: fadeUp 0.35s ease; }
+    .page.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header */
+    .site-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .moon-icon {
+      width: 56px; height: 56px;
+      background: var(--purple-400);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 26px;
+    }
+    .site-header h1 {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .site-header p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      background: var(--purple-50);
+      color: var(--purple-800);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+    }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 1.5rem; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-meta span {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .progress-meta strong {
+      font-size: 12px;
+      color: var(--purple-600);
+      font-weight: 700;
+    }
+    .progress-track {
+      height: 6px;
+      background: rgba(127,119,221,0.12);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple-400), var(--purple-600));
+      border-radius: 20px;
+      transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 20px rgba(127,119,221,0.06);
+    }
+
+    .q-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--purple-400);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .q-text {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Options */
+    .option-list { display: flex; flex-direction: column; gap: 8px; }
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: #fafafa;
+      cursor: pointer;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--text-primary);
+      text-align: left;
+      transition: all 0.18s ease;
+      width: 100%;
+    }
+    .option-btn:hover {
+      border-color: var(--purple-200);
+      background: var(--purple-50);
+      transform: translateX(3px);
+    }
+    .option-btn.selected {
+      border-color: var(--purple-400);
+      background: var(--purple-50);
+      color: var(--purple-800);
+    }
+    .option-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(127,119,221,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      color: var(--purple-600);
+      transition: all 0.18s;
+    }
+    .option-btn.selected .option-num {
+      background: var(--purple-400);
+      color: #fff;
+    }
+
+    /* Text Input */
+    .text-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--text-primary);
+      background: #fafafa;
+      outline: none;
+      transition: all 0.18s;
+    }
+    .text-input:focus {
+      border-color: var(--purple-400);
+      background: var(--purple-50);
+      box-shadow: 0 0 0 4px rgba(127,119,221,0.1);
+    }
+    .text-input::placeholder { color: var(--text-muted); }
+
+    /* Buttons */
+    .nav-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+    .btn-prev {
+      flex: 1;
+      padding: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: white;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.18s;
+      font-weight: 500;
+    }
+    .btn-prev:hover { background: #f5f5ff; border-color: var(--border-hover); }
+
+    .btn-next {
+      flex: 2;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--purple-400);
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      box-shadow: 0 4px 15px rgba(127,119,221,0.3);
+    }
+    .btn-next:hover {
+      background: var(--purple-600);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(127,119,221,0.4);
+    }
+    .btn-next:active { transform: translateY(0); }
+
+    .btn-full {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: var(--radius-lg);
+      background: var(--purple-400);
+      font-size: 16px;
+      font-family: 'Noto Sans KR', sans-serif;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      box-shadow: 0 4px 15px rgba(127,119,221,0.3);
+    }
+    .btn-full:hover {
+      background: var(--purple-600);
+      transform: translateY(-1px);
+    }
+
+    /* Info row */
+    .info-row { display: flex; flex-direction: column; gap: 16px; }
+    .info-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+    }
+
+    /* Error */
+    .error-msg {
+      font-size: 13px;
+      color: #A32D2D;
+      margin-top: 8px;
+      display: none;
+      padding: 8px 12px;
+      background: #fff5f5;
+      border-radius: 8px;
+      border-left: 3px solid #e24b4a;
+    }
+
+    /* Welcome page specific */
+    .welcome-title {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .welcome-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Result */
+    .result-name {
+      font-family: 'Nanum Gothic', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .result-meta {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .level-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .result-summary {
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 16px;
+      background: #f7f6ff;
+      border-radius: var(--radius-lg);
+      margin-bottom: 0;
+    }
+    .stat-item { text-align: center; }
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .stat-value.big { font-size: 22px; }
+    .stat-note { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+    .tips-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 20px rgba(127,119,221,0.06);
+    }
+    .tips-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tip-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip-item {
+      display: flex;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--purple-50);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.6;
+      align-items: flex-start;
+    }
+    .tip-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple-400);
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+
+    .who-card {
+      background: linear-gradient(135deg, var(--purple-50) 0%, #f0efff 100%);
+      border: 1px solid rgba(127,119,221,0.2);
+      border-radius: var(--radius-xl);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .who-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--purple-600);
+      margin-bottom: 6px;
+    }
+    .who-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.7;
+    }
+    .who-text strong { color: var(--purple-600); }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 1.5rem 0.75rem 3rem; }
+      .stats-row { grid-template-columns: 1fr; gap: 8px; }
+      .stat-item { display: flex; justify-content: space-between; align-items: center; }
+      .stat-label { margin-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="survey-wrap" id="survey-wrap">
+
+  <!-- Page 0: 학번 & 이름 -->
+  <div class="page active" id="page-0">
+    <div class="site-header">
+      <div class="moon-icon">🌙</div>
+      <h1>청소년 수면 습관 설문조사</h1>
+      <p>여러분의 수면 습관을 알아보고<br>맞춤 피드백을 드려요.</p>
+    </div>
+    <div class="card">
+      <div class="badge">기본 정보 입력</div>
+      <div class="info-row">
+        <div class="info-field">
+          <label>학번</label>
+          <input class="text-input" id="input-id" type="text" placeholder="예) 20301" maxlength="10">
+        </div>
+        <div class="info-field">
+          <label>이름</label>
+          <input class="text-input" id="input-name" type="text" placeholder="이름을 입력하세요" maxlength="20">
+        </div>
+      </div>
+      <div class="error-msg" id="err-0">학번과 이름을 모두 입력해 주세요.</div>
+    </div>
+    <button class="btn-full" onclick="goNext0()">시작하기 →</button>
+  </div>
+
+  <!-- Page 1: 닉네임 -->
+  <div class="page" id="page-1">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>문항 0 / 10</span>
+        <strong>0%</strong>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="q-label">Q 0</div>
+      <div class="q-text">학생 닉네임을 입력해 주세요.<br><span style="font-size:13px;font-weight:400;color:var(--text-muted)">(결과 확인용)</span></div>
+      <input class="text-input" id="input-nick" type="text" placeholder="닉네임을 입력하세요" maxlength="20">
+      <div class="error-msg" id="err-1">닉네임을 입력해 주세요.</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-prev" onclick="showPage(0)">← 이전</button>
+      <button class="btn-next" onclick="goNick()">다음 →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q:"평일(등교일)에 보통 몇 시간 동안 잠을 자나요?", opts:["6시간 미만","6시간 이상 ~ 8시간 미만","8시간 이상 ~ 10시간 미만","10시간 이상"] },
+  { q:"잠들기 직전까지 스마트폰이나 태블릿 등 전자기기를 사용하나요?", opts:["항상 사용한다","가끔 사용한다","거의 사용하지 않는다","전혀 사용하지 않는다"] },
+  { q:"아침에 일어났을 때 얼마나 개운함을 느끼나요?", opts:["매우 개운하다","보통이다","피곤함을 느낀다","매우 피곤하고 힘들다"] },
+  { q:"잠자리에 누운 후 실제 잠들기까지 보통 시간이 얼마나 걸리나요?", opts:["15분 이내 (바로 잠든다)","15분 ~ 30분","30분 ~ 1시간","1시간 이상 (뒤척인다)"] },
+  { q:"평일과 주말의 수면 시간 차이는 어느 정도인가요?", opts:["차이가 거의 없다","1~2시간 정도 더 잔다","3시간 이상 더 잔다","주말에 오히려 덜 잔다"] },
+  { q:"수업 시간에 졸음을 참기 힘들 때가 얼마나 자주 있나요?", opts:["거의 매일 그렇다","일주일에 2~3번 정도","시험 기간 등 가끔 그렇다","거의 없다"] },
+  { q:"수면을 방해하는 가장 큰 원인은 무엇이라고 생각하나요?", opts:["학업 및 숙제","SNS 및 게임 (스마트폰)","스트레스 및 걱정","소음이나 조명 등 환경"] },
+  { q:"카페인 음료(커피, 에너지드링크 등)를 얼마나 자주 마시나요?", opts:["매일 마신다","일주일에 2~3번 마신다","일주일에 1번 마신다","전혀 마시지 않는다"] },
+  { q:"밤에 자다가 깨는 경우가 일주일에 몇 번 정도 있나요?", opts:["없음 (한 번도 안 깬다)","1~2번 정도","3~4번 정도","매일 밤 여러 번 깬다"] },
+  { q:"본인의 전반적인 수면 만족도를 점수로 매긴다면?", opts:["매우 만족 (8-10점)","보통 (5-7점)","불만족 (3-4점)","매우 불만족 (0-2점)"] }
+];
+
+const answers = {};
+const wrap = document.getElementById('survey-wrap');
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) { pg.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+}
+
+function goNext0() {
+  const sid = document.getElementById('input-id').value.trim();
+  const sname = document.getElementById('input-name').value.trim();
+  if (!sid || !sname) { document.getElementById('err-0').style.display='block'; return; }
+  document.getElementById('err-0').style.display='none';
+  showPage(1);
+}
+
+function goNick() {
+  const nick = document.getElementById('input-nick').value.trim();
+  if (!nick) { document.getElementById('err-1').style.display='block'; return; }
+  document.getElementById('err-1').style.display='none';
+  answers['nick'] = nick;
+  buildQuestion(0);
+}
+
+function buildQuestion(idx) {
+  const pageId = 'page-q-' + idx;
+  const pct = Math.round((idx / 10) * 100);
+
+  if (!document.getElementById(pageId)) {
+    const q = questions[idx];
+    const div = document.createElement('div');
+    div.className = 'page';
+    div.id = pageId;
+    div.innerHTML = `
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span>문항 ${idx+1} / 10</span>
+          <strong>${pct}%</strong>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="card">
+        <div class="q-label">Q ${idx+1}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="option-list" id="opts-${idx}">
+          ${q.opts.map((o,i) => `
+            <button class="option-btn" id="opt-${idx}-${i}" onclick="selectOpt(${idx},${i})">
+              <span class="option-num">${['①','②','③','④'][i]}</span>
+              <span>${o}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div class="error-msg" id="err-q-${idx}">항목을 선택해 주세요.</div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-prev" onclick="goPrevQ(${idx})">← 이전</button>
+        <button class="btn-next" onclick="goNextQ(${idx})">${idx < 9 ? '다음 →' : '결과 보기 ✓'}</button>
+      </div>
+    `;
+    wrap.appendChild(div);
+  } else {
+    const pb = document.querySelector('#page-q-'+idx+' .progress-fill');
+    if (pb) pb.style.width = pct + '%';
+    const pl = document.querySelector('#page-q-'+idx+' .progress-meta strong');
+    if (pl) pl.textContent = pct + '%';
+  }
+
+  if (answers[idx] !== undefined) {
+    for (let i = 0; i < 4; i++) {
+      const b = document.getElementById('opt-'+idx+'-'+i);
+      if (b) b.classList.toggle('selected', i === answers[idx]);
+    }
+  }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selectOpt(qIdx, oIdx) {
+  answers[qIdx] = oIdx;
+  for (let i = 0; i < 4; i++) {
+    const b = document.getElementById('opt-'+qIdx+'-'+i);
+    if (b) b.classList.toggle('selected', i === oIdx);
+  }
+  document.getElementById('err-q-'+qIdx).style.display = 'none';
+}
+
+function goPrevQ(idx) {
+  if (idx === 0) { showPage(1); return; }
+  buildQuestion(idx - 1);
+}
+
+function goNextQ(idx) {
+  if (answers[idx] === undefined) {
+    document.getElementById('err-q-'+idx).style.display = 'block'; return;
+  }
+  if (idx < 9) { buildQuestion(idx + 1); }
+  else { showResults(); }
+}
+
+function calcScore() {
+  const weights = [
+    [0,1,2,3],[3,2,1,0],[0,1,2,3],[0,1,2,3],[0,1,2,3],
+    [3,2,1,0],null,[3,2,1,0],[0,1,2,3],[3,2,1,0]
+  ];
+  let score = 0, total = 0;
+  for (let i = 0; i < 10; i++) {
+    if (weights[i] && answers[i] !== undefined) {
+      score += weights[i][answers[i]]; total += 3;
+    }
+  }
+  return { score, total, pct: Math.round(score / total * 100) };
+}
+
+function showResults() {
+  const nick = answers['nick'] || '학생';
+  const sid = document.getElementById('input-id').value.trim();
+  const sname = document.getElementById('input-name').value.trim();
+  const { pct } = calcScore();
+
+  let level, levelColor, levelBg, summary, tips;
+  if (pct <= 30) {
+    level = '수면 습관 양호 😊'; levelColor = '#0F6E56'; levelBg = '#E1F5EE';
+    summary = '전반적으로 수면 습관이 좋은 편이에요! 지금의 생활 패턴을 꾸준히 유지하는 것이 중요해요.';
+    tips = ['취침 시간과 기상 시간을 일정하게 유지해 보세요.','수면 전 가벼운 스트레칭이나 독서를 습관화해 보세요.','주말에도 평일과 비슷한 시간에 일어나 생체리듬을 지켜 주세요.'];
+  } else if (pct <= 55) {
+    level = '수면 습관 보통 🙂'; levelColor = '#534AB7'; levelBg = '#EEEDFE';
+    summary = '수면 습관이 보통 수준이에요. 몇 가지를 개선하면 훨씬 더 개운하게 하루를 시작할 수 있어요!';
+    tips = ['잠들기 1시간 전에는 스마트폰 사용을 줄여 보세요. 블루라이트가 수면을 방해해요.','카페인 음료는 오후 3시 이후에는 마시지 않는 것이 좋아요.','규칙적인 취침 시간을 정해서 뇌가 수면 패턴을 기억하게 해 주세요.','잠들기 전 10분 스트레칭이나 복식호흡을 시도해 보세요.'];
+  } else if (pct <= 75) {
+    level = '수면 습관 주의 필요 😐'; levelColor = '#854F0B'; levelBg = '#FAEEDA';
+    summary = '수면 습관에 개선이 필요한 상태예요. 지금부터 조금씩 바꿔 나간다면 집중력과 기분이 훨씬 좋아질 거예요.';
+    tips = ['취침 전 스마트폰을 침대 밖에 두고 전자기기 없이 잠드는 연습을 해보세요.','카페인 음료(에너지드링크, 커피) 섭취를 줄이거나 끊어 보세요.','낮잠은 20분 이내로 제한하고, 저녁 이후의 낮잠은 피하세요.','수면 전 걱정이나 스트레스 해소를 위해 일기를 쓰거나 간단한 명상을 해보세요.','주말에 늦잠 자는 습관을 줄이고 1~2시간 내로 조절해 보세요.'];
+  } else {
+    level = '수면 습관 개선 시급 😟'; levelColor = '#791F1F'; levelBg = '#FCEBEB';
+    summary = '수면 습관이 많이 불규칙한 상태예요. 건강과 학업 모두에 영향을 줄 수 있어요. 작은 변화부터 시작해 보세요!';
+    tips = ['지금 당장 취침 시간을 30분만 앞당겨 보세요. 작은 변화가 큰 차이를 만들어요.','잠들기 전 스마트폰 사용을 1시간 전부터 완전히 중단해 보세요.','카페인 음료는 가능하면 전혀 마시지 않는 것을 목표로 해보세요.','주말 수면 패턴을 평일과 비슷하게 맞춰 사회적 시차(Social Jetlag)를 줄이세요.','심한 수면 장애가 의심된다면 부모님이나 선생님께 상담을 요청해 보세요.'];
+  }
+
+  const sleepLabels = ['6시간 미만','6~8시간','8~10시간','10시간 이상'];
+  const causeLabels = ['학업 및 숙제','SNS 및 게임','스트레스','소음/환경'];
+  const sleepStr = answers[0] !== undefined ? sleepLabels[answers[0]] : '-';
+  const causeStr = answers[6] !== undefined ? causeLabels[answers[6]] : '-';
+
+  const pg = document.createElement('div');
+  pg.className = 'page';
+  pg.id = 'page-result';
+  pg.innerHTML = `
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="width:64px;height:64px;background:${levelBg};border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px">🌙</div>
+      <p class="result-name">${nick} 학생의 수면 결과</p>
+      <p class="result-meta">${sname} · ${sid}</p>
+    </div>
+
+    <div class="card">
+      <span class="level-badge" style="background:${levelBg};color:${levelColor}">${level}</span>
+      <p class="result-summary">${summary}</p>
+      <div class="divider"></div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-label">수면 문제<br>점수</div>
+          <div class="stat-value big" style="color:${levelColor}">${pct}점</div>
+          <div class="stat-note">낮을수록 좋음</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">평균<br>수면 시간</div>
+          <div class="stat-value" style="font-size:14px">${sleepStr}</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">주요<br>방해 요인</div>
+          <div class="stat-value" style="font-size:13px">${causeStr}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tips-card">
+      <div class="tips-label">💡 개선을 위한 제안</div>
+      <div class="tip-list">
+        ${tips.map(t => `<div class="tip-item"><div class="tip-dot"></div><span>${t}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="who-card">
+      <div class="who-label">📌 청소년 권장 수면 시간</div>
+      <p class="who-text">세계보건기구(WHO)와 미국수면재단은 <strong>중학생(13~15세)에게 하루 8~10시간</strong>의 수면을 권장해요. 규칙적인 수면 습관은 기억력, 집중력, 면역력 모두에 도움을 줘요.</p>
+    </div>
+
+    <button class="btn-full" style="margin-top:0.5rem" onclick="resetSurvey()">처음으로 돌아가기</button>
+  `;
+  wrap.appendChild(pg);
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  pg.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetSurvey() {
+  for (const k in answers) delete answers[k];
+  document.querySelectorAll('[id^="page-q-"], #page-result').forEach(e => e.remove());
+  document.getElementById('input-id').value = '';
+  document.getElementById('input-name').value = '';
+  document.getElementById('input-nick').value = '';
+  showPage(0);
+}
+</script>
+</body>
+</html>
