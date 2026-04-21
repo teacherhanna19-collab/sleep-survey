@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>청소년 수면 습관 설문</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #4a6fa5;
+    }
+    .question {
+      margin-top: 20px;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+      cursor: pointer;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #4a6fa5;
+      color: white;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #eef3ff;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container" id="survey">
+  <h1>청소년 수면 습관 설문</h1>
+
+  <h3>기본 정보</h3>
+  학번: <input type="text" id="studentId">
+  이름: <input type="text" id="name">
+
+  <div id="questions"></div>
+
+  <button onclick="submitSurvey()">제출하기</button>
+
+  <div id="result">
+    <h2>📊 수면 습관 분석 결과</h2>
+    <p id="feedback"></p>
+    <p id="tips"></p>
+    <button onclick="saveImage()">📷 결과 이미지 저장</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+"평일 수면 시간",
+"전자기기 사용 여부",
+"아침 개운함",
+"잠드는 시간",
+"주말 수면 차이",
+"수업 중 졸림",
+"수면 방해 원인",
+"카페인 섭취",
+"야간 각성 빈도",
+"수면 만족도"
+];
+
+const options = [
+["6시간 미만","6~8시간","8~10시간","10시간 이상"],
+["항상","가끔","거의 없음","전혀 없음"],
+["매우 개운","보통","피곤","매우 피곤"],
+["15분 이내","15~30분","30~1시간","1시간 이상"],
+["차이 없음","1~2시간","3시간 이상","주말에 덜 잠"],
+["거의 매일","주2~3회","가끔","거의 없음"],
+["학업","스마트폰","스트레스","환경"],
+["매일","주2~3회","주1회","없음"],
+["없음","1~2회","3~4회","매일"],
+["매우 만족","보통","불만족","매우 불만족"]
+];
+
+const container = document.getElementById("questions");
+
+questions.forEach((q, i) => {
+  let html = `<div class="question"><b>${i+1}. ${q}</b>`;
+  options[i].forEach((opt, j) => {
+    html += `<label><input type="radio" name="q${i}" value="${j}"> ${opt}</label>`;
+  });
+  html += "</div>";
+  container.innerHTML += html;
+});
+
+function submitSurvey(){
+  let score = 0;
+
+  for(let i=0;i<10;i++){
+    let checked = document.querySelector(`input[name=q${i}]:checked`);
+    if(!checked){
+      alert("모든 문항에 답해주세요!");
+      return;
+    }
+    score += parseInt(checked.value);
+  }
+
+  let feedback = "";
+  let tips = "";
+
+  if(score < 10){
+    feedback = "🌟 매우 건강한 수면 습관을 가지고 있어요!";
+    tips = "지금처럼 규칙적인 생활을 유지하세요 👍";
+  } else if(score < 20){
+    feedback = "🙂 비교적 좋은 수면 습관이에요.";
+    tips = "취침 전 스마트폰 사용을 줄이면 더 좋아질 수 있어요.";
+  } else if(score < 30){
+    feedback = "😐 수면 습관 개선이 필요해요.";
+    tips = "일정한 취침 시간 유지 + 카페인 줄이기 + 스마트폰 사용 제한을 추천합니다.";
+  } else {
+    feedback = "⚠️ 수면 부족 상태일 가능성이 높아요.";
+    tips = "✔ 취침 1시간 전 전자기기 사용 금지\n✔ 매일 같은 시간에 잠들기\n✔ 카페인 섭취 줄이기\n✔ 스트레스 관리 필요";
+  }
+
+  document.getElementById("feedback").innerText = feedback;
+  document.getElementById("tips").innerText = tips;
+  document.getElementById("result").style.display = "block";
+}
+
+function saveImage(){
+  html2canvas(document.getElementById("result")).then(canvas => {
+    let link = document.createElement("a");
+    link.download = "sleep_result.jpg";
+    link.href = canvas.toDataURL("image/jpeg");
+    link.click();
+  });
+}
+</script>
+
+</body>
+</html>
